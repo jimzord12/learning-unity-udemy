@@ -1,0 +1,18 @@
+# Section 02 answers (check only after you attempted each question)
+
+1. `Start()` runs once, before the first `Update`, when the script is enabled. `Update()` runs once per rendered frame. Frame time varies (slow PC, busy scene), so the rate is not fixed.
+2. `6`, `7`, `8`. `Start` sets 5 once, then each frame `score++` runs before the log.
+3. A public field can be changed by any other script (breaks encapsulation). `[SerializeField] private` shows in the Inspector but only this class can touch it. Prefer it.
+4. `transform.Translate(xValue * 5f * Time.deltaTime, 0, 0);`. `deltaTime` is the seconds the last frame took. Without it you move 5 units per *frame*, so 120 FPS is 4x faster than 30 FPS. With it you move 5 units per *second* at any frame rate.
+5. Your project is **new Input System only** (`activeInputHandler: 1`). The legacy `UnityEngine.Input` class throws `InvalidOperationException: You are trying to read Input using the UnityEngine.Input class, but you have switched active Input handling to Input System package in Player Settings.` Use the Input System: `InputActionReference`/`PlayerInput` with the generated `InputSystem_Actions` (`ReadValue<Vector2>()`), or `Keyboard.current`. (Temporary workaround: Player Settings > Active Input Handling > Both.) Search: `unity input system read action value Vector2`.
+6. Collision = physical contact, objects bounce/block: `OnCollisionEnter(Collision)`. Trigger = overlap with no physical response, collider has **Is Trigger** ticked: `OnTriggerEnter(Collider)`. Both need colliders and **at least one Rigidbody** among the two objects.
+7. At least one of the objects needs a **Rigidbody**. Two static colliders do not generate callbacks.
+8. In `Awake` or `Start`: `rb = GetComponent<Rigidbody>();` into a private field, then reuse `rb`. Calling `GetComponent` every frame in `Update` repeats a lookup you only needed once.
+9. `if (collision.gameObject.CompareTag("Player"))`. `.tag == "..."` allocates a string every call; `CompareTag` does not, and logs an error if the tag does not exist (catches typos).
+10. `Awake` -> `OnEnable` -> `Start` -> `Update` -> `LateUpdate` (physics `FixedUpdate` runs separately, before `Update`). `Awake` runs for every object as the scene loads, before any `Start`, so your own references are ready; `Start` runs later, when other objects' `Awake` has finished, so it is safer to read from them.
+11. A prefab is a reusable asset template of a GameObject (with its components). An override is a change on one instance that differs from the prefab. Hazards as prefabs means you edit the prefab once and every instance updates, and you can spawn them in code.
+12. It is destroyed after 2 seconds. `Destroy(this)` destroys only that *script component*, not the GameObject.
+13. `Time.time`: seconds since the game started (e.g. a timer or score by survival time). `Time.deltaTime`: seconds since the last frame (frame-rate independent movement).
+14. Window > Package Manager > Unity Registry > Cinemachine, or edit nothing by hand. In Cinemachine 3 the older `CinemachineVirtualCamera` is replaced by `CinemachineCamera`, with a `CinemachineBrain` on the main Camera; the older components and Inspector layouts differ. In Unity 6.6 Cinemachine is a core package. Check the docs at `docs.unity3d.com/Packages/com.unity.cinemachine@<ver>/manual/` for the version you install.
+
+**Rebuild challenge hints:** Player: `InputActionReference` or `Keyboard.current`, move with `Time.deltaTime`. Hazard prefab with `OnCollisionEnter` + `CompareTag`. Score: `Time.time` or a timer. Cache `Rigidbody`/references in `Awake`.
